@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:calendar3/entities/Event.dart';
+import 'package:calendar3/entities/event.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class MapScreen extends StatefulWidget {
   final ExamEvent event;
@@ -227,6 +229,10 @@ class _MapScreenState extends State<MapScreen> {
                 ),
             ],
           ),
+          ElevatedButton(
+            onPressed: () => openGoogleMaps(widget.event.location.latitude, widget.event.location.longitude),
+            child: Text('Open in Google Maps'),
+          ),
           if (_isLoadingRoute)
             Container(
               color: Colors.black.withOpacity(0.3),
@@ -239,3 +245,16 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 }
+void openGoogleMaps(double latitude, double longitude) async {
+  final Uri googleMapsUri = Uri.parse(
+      "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude");
+
+  if (await canLaunchUrl(googleMapsUri)) {
+    await launchUrl(googleMapsUri, mode: LaunchMode.externalApplication);
+  } else {
+    print("ERROR: Could not open Google Maps app");
+    throw "Could not open Google Maps";
+  }
+}
+
+
